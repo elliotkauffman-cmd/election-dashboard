@@ -22,7 +22,7 @@ button:hover{background:#00b8d4}
 </div>
 <script>
 if(!sessionStorage.getItem("supabaseSession")){window.location.href="index.html";}
-var SALT="rQ/xDKxfVPPTTvyJiurPSg==",IV="TbbEnDMXhsGv3gyu",TAG="Dq4M6rIH2m18HEyKurq5Ug==";
+var SALT="FopGvEKi545lTcfy+E3BAQ==",IV="aX06UmRSgN9/bHgb",TAG="0e1L23S/40ZzCIPc4j39Qg==";
 var CHUNKS=3;
 var CHUNK_FILES=["data_0.js","data_1.js","data_2.js"];
 function b2a(b){var r=atob(b),a=new Uint8Array(r.length);for(var i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a}
@@ -42,7 +42,7 @@ function unlock(){
   function loadChunk(idx){
     return new Promise(function(resolve,reject){
       var s=document.createElement("script");
-      s.src=CHUNK_FILES[idx]+"?v=1774180317234";
+      s.src=CHUNK_FILES[idx]+"?v=1774181668025";
       s.onload=function(){loaded++;showProgress("Loading data "+loaded+"/"+CHUNKS+"...",5+(loaded/CHUNKS)*40);resolve();};
       s.onerror=function(){reject(new Error("Failed to load "+CHUNK_FILES[idx]));};
       document.head.appendChild(s);
