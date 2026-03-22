@@ -526,6 +526,7 @@
                                 allowedDistricts: ['ALL']
                             };
                             sessionStorage.setItem('electionDashSession', JSON.stringify(sessionData));
+                            sessionStorage.setItem('supabaseSession', JSON.stringify(sessionData));
                             window.location.href = 'dashboard.html';
                             return;
                         }
