@@ -22,9 +22,9 @@ button:hover{background:#00b8d4}
 </div>
 <script>
 if(!sessionStorage.getItem("supabaseSession")){window.location.href="index.html";}
-var SALT="FopGvEKi545lTcfy+E3BAQ==",IV="aX06UmRSgN9/bHgb",TAG="0e1L23S/40ZzCIPc4j39Qg==";
-var CHUNKS=3;
-var CHUNK_FILES=["data_0.js","data_1.js","data_2.js"];
+var SALT="sLFKEq0q3HBzosDbHDfulQ==",IV="LLooAyqXVfb8QMtm",TAG="lvkGBBSPGI+kOj5DsyNHrw==";
+var CHUNKS=6;
+var CHUNK_FILES=["data_0.js","data_1.js","data_2.js","data_3.js","data_4.js","data_5.js"];
 function b2a(b){var r=atob(b),a=new Uint8Array(r.length);for(var i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a}
 function showProgress(msg,pct){
   document.getElementById("prog").style.display="block";
@@ -42,7 +42,7 @@ function unlock(){
   function loadChunk(idx){
     return new Promise(function(resolve,reject){
       var s=document.createElement("script");
-      s.src=CHUNK_FILES[idx]+"?v=1774181668025";
+      s.src=CHUNK_FILES[idx]+"?v=1774182341164";
       s.onload=function(){loaded++;showProgress("Loading data "+loaded+"/"+CHUNKS+"...",5+(loaded/CHUNKS)*40);resolve();};
       s.onerror=function(){reject(new Error("Failed to load "+CHUNK_FILES[idx]));};
       document.head.appendChild(s);
