@@ -4,7 +4,6 @@
  * This script should be injected into the decrypted dashboard HTML.
  * It verifies the user's session and enforces permission-based filtering.
  */
-
 (function() {
     'use strict';
 
@@ -15,6 +14,15 @@
     const AUTH_SESSION_KEY = 'supabaseSession';
     let currentUserSession = null;
     let userPermissions = null;
+
+    /**
+     * Check if a permission array grants unrestricted access
+     * Returns true if array is empty (no restrictions) or contains 'ALL'
+     */
+    function isUnrestricted(permArray) {
+        if (!permArray || permArray.length === 0) return true;
+        return permArray.some(v => v.toUpperCase() === 'ALL');
+    }
 
     /**
      * Initialize authentication on page load
@@ -68,7 +76,6 @@
     function initializeUserInfo() {
         // Check if user info container already exists
         let userInfoContainer = document.getElementById('auth-user-info');
-
         if (!userInfoContainer) {
             userInfoContainer = document.createElement('div');
             userInfoContainer.id = 'auth-user-info';
@@ -106,13 +113,11 @@
                     padding: 12px 16px;
                     backdrop-filter: blur(10px);
                 }
-
                 .user-info-content {
                     display: flex;
                     align-items: center;
                     gap: 12px;
                 }
-
                 .user-avatar {
                     width: 36px;
                     height: 36px;
@@ -125,13 +130,11 @@
                     font-weight: 600;
                     font-size: 14px;
                 }
-
                 .user-details {
                     display: flex;
                     flex-direction: column;
                     gap: 6px;
                 }
-
                 .user-email {
                     font-size: 12px;
                     color: #9ca3af;
@@ -140,7 +143,6 @@
                     text-overflow: ellipsis;
                     white-space: nowrap;
                 }
-
                 .logout-btn {
                     padding: 4px 12px;
                     background: rgba(239, 68, 68, 0.2);
@@ -152,31 +154,26 @@
                     font-weight: 500;
                     transition: all 0.3s ease;
                 }
-
                 .logout-btn:hover {
                     background: rgba(239, 68, 68, 0.3);
                     border-color: rgba(239, 68, 68, 0.6);
                     color: #fecaca;
                 }
-
                 @media (max-width: 768px) {
                     #auth-user-info {
                         top: 10px;
                         right: 10px;
                         padding: 8px 12px;
                     }
-
                     .user-avatar {
                         width: 32px;
                         height: 32px;
                         font-size: 12px;
                     }
-
                     .user-email {
                         font-size: 10px;
                         max-width: 120px;
                     }
-
                     .logout-btn {
                         padding: 3px 8px;
                         font-size: 10px;
@@ -192,7 +189,6 @@
      */
     function initializeLogoutButton() {
         const logoutBtn = document.getElementById('logoutBtn');
-
         if (logoutBtn) {
             logoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -244,13 +240,13 @@
         // Only apply filters if user has specific permission restrictions
         if (!userPermissions) return;
 
-        // Handle state filtering
-        if (userPermissions.allowedStates && userPermissions.allowedStates.length > 0) {
+        // Handle state filtering — skip if unrestricted (empty or 'ALL')
+        if (!isUnrestricted(userPermissions.allowedStates)) {
             filterStateButtons(userPermissions.allowedStates);
         }
 
-        // Handle race type filtering
-        if (userPermissions.allowedRaceTypes && userPermissions.allowedRaceTypes.length > 0) {
+        // Handle race type filtering — skip if unrestricted (empty or 'ALL')
+        if (!isUnrestricted(userPermissions.allowedRaceTypes)) {
             filterRaceTypeButtons(userPermissions.allowedRaceTypes);
         }
 
@@ -262,14 +258,15 @@
      * Filter state buttons based on allowed states
      */
     function filterStateButtons(allowedStates) {
+        // Double-check: if 'ALL' is present, skip filtering entirely
+        if (isUnrestricted(allowedStates)) return;
+
         // Find all state buttons (look for common selectors)
         const stateButtons = document.querySelectorAll('[data-state], [data-code], .state-btn, .state-button, [class*="state"]');
 
         stateButtons.forEach(button => {
             // Get state code from various possible attributes
-            const stateCode = button.dataset.state ||
-                            button.dataset.code ||
-                            button.textContent.trim().toUpperCase();
+            const stateCode = button.dataset.state || button.dataset.code || button.textContent.trim().toUpperCase();
 
             // Check if this state is allowed
             const isAllowed = allowedStates.some(state =>
@@ -294,6 +291,9 @@
      * Filter race type buttons based on allowed race types
      */
     function filterRaceTypeButtons(allowedRaceTypes) {
+        // If unrestricted, skip filtering entirely
+        if (isUnrestricted(allowedRaceTypes)) return;
+
         // Common race type selectors
         const raceTypeSelectors = [
             '[data-type]',
@@ -305,12 +305,9 @@
 
         raceTypeSelectors.forEach(selector => {
             const buttons = document.querySelectorAll(selector);
-
             buttons.forEach(button => {
                 // Get race type from various attributes
-                const raceType = button.dataset.type ||
-                               button.dataset.raceType ||
-                               button.textContent.trim();
+                const raceType = button.dataset.type || button.dataset.raceType || button.textContent.trim();
 
                 // Map common race type names
                 const mappedType = mapRaceType(raceType);
@@ -345,7 +342,6 @@
             'Federal': 'FED',
             'Statewide': 'SW'
         };
-
         return typeMap[type] || type;
     }
 
@@ -356,14 +352,16 @@
         // Hook into state selection if dashboard has a global currentStateCode
         if (window.selectState && typeof window.selectState === 'function') {
             const originalSelectState = window.selectState;
-
             window.selectState = function(code) {
+                // If unrestricted (empty or 'ALL'), allow everything
+                if (isUnrestricted(userPermissions.allowedStates)) {
+                    return originalSelectState.call(this, code);
+                }
+
                 // Check if user has access to this state
-                if (userPermissions.allowedStates &&
-                    userPermissions.allowedStates.length > 0 &&
-                    !userPermissions.allowedStates.some(state =>
-                        state.toUpperCase() === code.toUpperCase()
-                    )) {
+                if (!userPermissions.allowedStates.some(state =>
+                    state.toUpperCase() === code.toUpperCase()
+                )) {
                     console.warn('Access denied for state:', code);
                     alert('You do not have access to view this state.');
                     return false;
@@ -374,13 +372,12 @@
             };
         }
 
-        // Check initial state if set
-        if (window.currentStateCode && userPermissions.allowedStates &&
-            userPermissions.allowedStates.length > 0) {
+        // Check initial state if set — only enforce if restricted
+        if (window.currentStateCode &&
+            !isUnrestricted(userPermissions.allowedStates)) {
             const isCurrentStateAllowed = userPermissions.allowedStates.some(state =>
                 state.toUpperCase() === window.currentStateCode.toUpperCase()
             );
-
             if (!isCurrentStateAllowed) {
                 // Switch to first allowed state
                 const firstAllowedState = userPermissions.allowedStates[0];
@@ -405,7 +402,6 @@
             writable: false,
             configurable: false
         });
-
         Object.defineProperty(window, 'userPermissions', {
             value: userPermissions,
             writable: false,
@@ -445,8 +441,9 @@
          * Check if user has access to a specific state
          */
         hasStateAccess: function(stateCode) {
-            if (!userPermissions?.allowedStates || userPermissions.allowedStates.length === 0) {
-                return true; // No restrictions
+            // No restrictions if empty or contains 'ALL'
+            if (isUnrestricted(userPermissions?.allowedStates)) {
+                return true;
             }
             return userPermissions.allowedStates.some(state =>
                 state.toUpperCase() === stateCode.toUpperCase()
@@ -457,8 +454,9 @@
          * Check if user has access to a specific race type
          */
         hasRaceTypeAccess: function(raceType) {
-            if (!userPermissions?.allowedRaceTypes || userPermissions.allowedRaceTypes.length === 0) {
-                return true; // No restrictions
+            // No restrictions if empty or contains 'ALL'
+            if (isUnrestricted(userPermissions?.allowedRaceTypes)) {
+                return true;
             }
             return userPermissions.allowedRaceTypes.some(type =>
                 mapRaceType(type).toUpperCase() === mapRaceType(raceType).toUpperCase()
