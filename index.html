@@ -73,6 +73,7 @@
             border-bottom: 2px solid transparent;
             position: relative;
             bottom: -1px;
+            type: button;
         }
 
         .tab.active {
@@ -138,6 +139,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 8px;
+            type: button;
         }
 
         .submit-btn:hover {
@@ -259,6 +261,7 @@
             font-size: 12px;
             margin-bottom: 16px;
             transition: all 0.3s ease;
+            type: button;
         }
 
         .back-button:hover {
@@ -296,8 +299,8 @@
         <div class="auth-card">
             <div id="mainAuthSection">
                 <div class="tabs">
-                    <button class="tab active" data-tab="login">Login</button>
-                    <button class="tab" data-tab="signup">Sign Up</button>
+                    <button type="button" class="tab active" data-tab="login">Login</button>
+                    <button type="button" class="tab" data-tab="signup">Sign Up</button>
                 </div>
 
                 <!-- Login Form -->
@@ -314,7 +317,7 @@
                         <input type="password" id="loginPassword" placeholder="••••••••" required>
                     </div>
 
-                    <button class="submit-btn" id="loginBtn">Sign In</button>
+                    <button type="button" class="submit-btn" id="loginBtn" onclick="handleLoginClick()">Sign In</button>
 
                     <div class="forgot-password">
                         <a href="#" id="forgotPasswordLink">Forgot password?</a>
@@ -345,13 +348,13 @@
                         <input type="password" id="signupPasswordConfirm" placeholder="••••••••" required>
                     </div>
 
-                    <button class="submit-btn" id="signupBtn">Create Account</button>
+                    <button type="button" class="submit-btn" id="signupBtn" onclick="handleSignupClick()">Create Account</button>
                 </div>
             </div>
 
             <!-- Password Reset Section -->
             <div id="passwordResetSection" class="password-reset-section">
-                <button class="back-button" id="backToLoginBtn">← Back to Login</button>
+                <button type="button" class="back-button" id="backToLoginBtn">← Back to Login</button>
                 <div id="resetMessage" class="message"></div>
 
                 <div class="form-field">
@@ -359,317 +362,378 @@
                     <input type="email" id="resetEmail" placeholder="you@example.com" required>
                 </div>
 
-                <button class="submit-btn" id="resetBtn">Send Reset Link</button>
+                <button type="button" class="submit-btn" id="resetBtn" onclick="handleResetClick()">Send Reset Link</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Initialize Supabase
-        const SUPABASE_URL = 'https://rklhazfezymvdvmpwvlz.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrbGhhemZlenltdmR2bXB3dmx6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwODEwOTcsImV4cCI6MjA4OTY1NzA5N30.WkWcehjIhBQsD7z7K7Ji2viqzNvK8G0LFkg8XVkV5-E';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        try {
+            // Initialize Supabase
+            const SUPABASE_URL = 'https://rklhazfezymvdvmpwvlz.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrbGhhemZlenltdmR2bXB3dmx6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwODEwOTcsImV4cCI6MjA4OTY1NzA5N30.WkWcehjIhBQsD7z7K7Ji2viqzNvK8G0LFkg8XVkV5-E';
 
-        // DOM Elements
-        const tabs = document.querySelectorAll('.tab');
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-        const mainAuthSection = document.getElementById('mainAuthSection');
-        const passwordResetSection = document.getElementById('passwordResetSection');
+            // Make supabase client globally accessible
+            window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const loginBtn = document.getElementById('loginBtn');
-        const signupBtn = document.getElementById('signupBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-        const backToLoginBtn = document.getElementById('backToLoginBtn');
+            // DOM Elements
+            const tabs = document.querySelectorAll('.tab');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const mainAuthSection = document.getElementById('mainAuthSection');
+            const passwordResetSection = document.getElementById('passwordResetSection');
 
-        const loginEmail = document.getElementById('loginEmail');
-        const loginPassword = document.getElementById('loginPassword');
-        const signupName = document.getElementById('signupName');
-        const signupEmail = document.getElementById('signupEmail');
-        const signupPassword = document.getElementById('signupPassword');
-        const signupPasswordConfirm = document.getElementById('signupPasswordConfirm');
-        const resetEmail = document.getElementById('resetEmail');
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            const backToLoginBtn = document.getElementById('backToLoginBtn');
 
-        const loginMessage = document.getElementById('loginMessage');
-        const signupMessage = document.getElementById('signupMessage');
-        const resetMessage = document.getElementById('resetMessage');
+            const loginEmail = document.getElementById('loginEmail');
+            const loginPassword = document.getElementById('loginPassword');
+            const signupName = document.getElementById('signupName');
+            const signupEmail = document.getElementById('signupEmail');
+            const signupPassword = document.getElementById('signupPassword');
+            const signupPasswordConfirm = document.getElementById('signupPasswordConfirm');
+            const resetEmail = document.getElementById('resetEmail');
 
-        // Tab switching
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.dataset.tab;
+            const loginMessage = document.getElementById('loginMessage');
+            const signupMessage = document.getElementById('signupMessage');
+            const resetMessage = document.getElementById('resetMessage');
 
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
+            // Ensure DOMContentLoaded is triggered or run immediately if DOM is already loaded
+            function initializeEventListeners() {
+                try {
+                    // Tab switching
+                    tabs.forEach(tab => {
+                        tab.addEventListener('click', () => {
+                            const tabName = tab.dataset.tab;
 
-                loginForm.classList.remove('active');
-                signupForm.classList.remove('active');
+                            tabs.forEach(t => t.classList.remove('active'));
+                            tab.classList.add('active');
 
-                if (tabName === 'login') {
-                    loginForm.classList.add('active');
-                    clearMessage(loginMessage);
+                            loginForm.classList.remove('active');
+                            signupForm.classList.remove('active');
+
+                            if (tabName === 'login') {
+                                loginForm.classList.add('active');
+                                clearMessage(loginMessage);
+                            } else {
+                                signupForm.classList.add('active');
+                                clearMessage(signupMessage);
+                            }
+                        });
+                    });
+
+                    // Forgot password
+                    forgotPasswordLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        mainAuthSection.style.display = 'none';
+                        passwordResetSection.classList.add('active');
+                        clearMessage(resetMessage);
+                    });
+
+                    backToLoginBtn.addEventListener('click', () => {
+                        passwordResetSection.classList.remove('active');
+                        mainAuthSection.style.display = 'block';
+                        clearMessage(resetMessage);
+                        clearMessage(loginMessage);
+                    });
+
+                    // addEventListener fallback for buttons
+                    loginBtn.addEventListener('click', handleLoginClick);
+                    signupBtn.addEventListener('click', handleSignupClick);
+                    resetBtn.addEventListener('click', handleResetClick);
+
+                    // Enter key support
+                    loginPassword.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') loginBtn.click();
+                    });
+
+                    signupPasswordConfirm.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') signupBtn.click();
+                    });
+
+                    resetEmail.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') resetBtn.click();
+                    });
+
+                    console.log('Event listeners initialized successfully');
+                } catch (listenerError) {
+                    console.error('Error initializing event listeners:', listenerError);
+                }
+            }
+
+            // Helper functions
+            function showMessage(element, message, type) {
+                element.textContent = message;
+                element.className = `message ${type}`;
+                element.style.display = 'block';
+            }
+
+            function clearMessage(element) {
+                element.textContent = '';
+                element.className = 'message';
+                element.style.display = 'none';
+            }
+
+            function setButtonLoading(btn, isLoading) {
+                if (isLoading) {
+                    btn.disabled = true;
+                    btn.innerHTML = btn.textContent + '<span class="loading"></span>';
                 } else {
-                    signupForm.classList.add('active');
-                    clearMessage(signupMessage);
+                    btn.disabled = false;
+                    btn.textContent = btn.textContent.replace('Sign In', 'Sign In')
+                                                     .replace('Create Account', 'Create Account')
+                                                     .replace('Send Reset Link', 'Send Reset Link');
                 }
-            });
-        });
-
-        // Forgot password
-        forgotPasswordLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            mainAuthSection.style.display = 'none';
-            passwordResetSection.classList.add('active');
-            clearMessage(resetMessage);
-        });
-
-        backToLoginBtn.addEventListener('click', () => {
-            passwordResetSection.classList.remove('active');
-            mainAuthSection.style.display = 'block';
-            clearMessage(resetMessage);
-            clearMessage(loginMessage);
-        });
-
-        // Helper functions
-        function showMessage(element, message, type) {
-            element.textContent = message;
-            element.className = `message ${type}`;
-            element.style.display = 'block';
-        }
-
-        function clearMessage(element) {
-            element.textContent = '';
-            element.className = 'message';
-            element.style.display = 'none';
-        }
-
-        function setButtonLoading(btn, isLoading) {
-            if (isLoading) {
-                btn.disabled = true;
-                btn.innerHTML = btn.textContent + '<span class="loading"></span>';
-            } else {
-                btn.disabled = false;
-                btn.textContent = btn.textContent.replace('Sign In', 'Sign In')
-                                                 .replace('Create Account', 'Create Account')
-                                                 .replace('Send Reset Link', 'Send Reset Link');
-            }
-        }
-
-        // Login
-        loginBtn.addEventListener('click', async () => {
-            const email = loginEmail.value.trim();
-            const password = loginPassword.value;
-
-            if (!email || !password) {
-                showMessage(loginMessage, 'Please fill in all fields', 'error');
-                return;
             }
 
-            setButtonLoading(loginBtn, true);
-            clearMessage(loginMessage);
+            // Login handler
+            async function handleLoginClick() {
+                const email = loginEmail.value.trim();
+                const password = loginPassword.value;
 
-            try {
-                // Sign in with Supabase
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password
-                });
-
-                if (error) {
-                    showMessage(loginMessage, error.message, 'error');
-                    setButtonLoading(loginBtn, false);
+                if (!email || !password) {
+                    showMessage(loginMessage, 'Please fill in all fields', 'error');
                     return;
                 }
 
-                // Get user profile
-                const { data: profile, error: profileError } = await supabase
-                    .from('user_profiles')
-                    .select('status, allowed_states, allowed_race_types, allowed_districts')
-                    .eq('id', data.user.id)
-                    .single();
+                setButtonLoading(loginBtn, true);
+                clearMessage(loginMessage);
 
-                if (profileError && profileError.code !== 'PGRST116') {
-                    showMessage(loginMessage, 'Error retrieving profile', 'error');
-                    setButtonLoading(loginBtn, false);
-                    return;
-                }
+                try {
+                    // Sign in with Supabase
+                    const { data, error } = await window.sb.auth.signInWithPassword({
+                        email,
+                        password
+                    });
 
-                // Store session in sessionStorage
-                const sessionData = {
-                    userId: data.user.id,
-                    email: data.user.email,
-                    userEmail: data.user.email,
-                    session: data.session
-                };
-
-                if (profile) {
-                    if (profile.status === 'pending') {
-                        showMessage(loginMessage, 'Your account is pending approval. Please wait for admin confirmation.', 'warning');
-                        await supabase.auth.signOut();
+                    if (error) {
+                        showMessage(loginMessage, error.message, 'error');
                         setButtonLoading(loginBtn, false);
                         return;
                     }
 
-                    sessionData.status = profile.status;
-                    sessionData.allowedStates = profile.allowed_states || [];
-                    sessionData.allowedRaceTypes = profile.allowed_race_types || [];
-                    sessionData.allowedDistricts = profile.allowed_districts || [];
+                    // Superuser list — these emails get full access automatically
+                    const SUPERUSERS = ['elliot.kauffman@gmail.com'];
+
+                    // Store session in sessionStorage
+                    const sessionData = {
+                        userId: data.user.id,
+                        email: data.user.email,
+                        userEmail: data.user.email,
+                        session: data.session
+                    };
+
+                    if (SUPERUSERS.includes(data.user.email.toLowerCase())) {
+                        // Superuser: grant full access, skip profile check
+                        sessionData.status = 'approved';
+                        sessionData.role = 'superuser';
+                        sessionData.allowedStates = ['ALL'];
+                        sessionData.allowedRaceTypes = ['ALL'];
+                        sessionData.allowedDistricts = ['ALL'];
+                    } else {
+                        // Regular user: check profile from DB
+                        const { data: profile, error: profileError } = await window.sb
+                            .from('user_profiles')
+                            .select('status, allowed_states, allowed_race_types, allowed_districts')
+                            .eq('id', data.user.id)
+                            .single();
+
+                        if (profileError && profileError.code !== 'PGRST116') {
+                            showMessage(loginMessage, 'Error retrieving profile', 'error');
+                            setButtonLoading(loginBtn, false);
+                            return;
+                        }
+
+                        if (profile) {
+                            if (profile.status === 'pending') {
+                                showMessage(loginMessage, 'Your account is pending approval. Please wait for admin confirmation.', 'warning');
+                                await window.sb.auth.signOut();
+                                setButtonLoading(loginBtn, false);
+                                return;
+                            }
+
+                            sessionData.status = profile.status;
+                            sessionData.allowedStates = profile.allowed_states || [];
+                            sessionData.allowedRaceTypes = profile.allowed_race_types || [];
+                            sessionData.allowedDistricts = profile.allowed_districts || [];
+                        }
+                    }
+
+                    sessionStorage.setItem('supabaseSession', JSON.stringify(sessionData));
+                    showMessage(loginMessage, 'Login successful! Redirecting...', 'success');
+
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+
+                } catch (err) {
+                    showMessage(loginMessage, err.message || 'An error occurred', 'error');
+                    setButtonLoading(loginBtn, false);
                 }
-
-                sessionStorage.setItem('supabaseSession', JSON.stringify(sessionData));
-                showMessage(loginMessage, 'Login successful! Redirecting...', 'success');
-
-                // Redirect to dashboard
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-
-            } catch (err) {
-                showMessage(loginMessage, err.message || 'An error occurred', 'error');
-                setButtonLoading(loginBtn, false);
-            }
-        });
-
-        // Sign up
-        signupBtn.addEventListener('click', async () => {
-            const name = signupName.value.trim();
-            const email = signupEmail.value.trim();
-            const password = signupPassword.value;
-            const confirmPassword = signupPasswordConfirm.value;
-
-            if (!name || !email || !password || !confirmPassword) {
-                showMessage(signupMessage, 'Please fill in all fields', 'error');
-                return;
             }
 
-            if (password !== confirmPassword) {
-                showMessage(signupMessage, 'Passwords do not match', 'error');
-                return;
-            }
+            // Sign up handler
+            async function handleSignupClick() {
+                const name = signupName.value.trim();
+                const email = signupEmail.value.trim();
+                const password = signupPassword.value;
+                const confirmPassword = signupPasswordConfirm.value;
 
-            if (password.length < 6) {
-                showMessage(signupMessage, 'Password must be at least 6 characters', 'error');
-                return;
-            }
-
-            setButtonLoading(signupBtn, true);
-            clearMessage(signupMessage);
-
-            try {
-                // Sign up
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password
-                });
-
-                if (error) {
-                    showMessage(signupMessage, error.message, 'error');
-                    setButtonLoading(signupBtn, false);
+                if (!name || !email || !password || !confirmPassword) {
+                    showMessage(signupMessage, 'Please fill in all fields', 'error');
                     return;
                 }
 
-                // Create user profile with pending status
-                if (data.user) {
-                    const { error: profileError } = await supabase
-                        .from('user_profiles')
-                        .update({ full_name: name })
-                        .eq('id', data.user.id);
+                if (password !== confirmPassword) {
+                    showMessage(signupMessage, 'Passwords do not match', 'error');
+                    return;
+                }
 
-                    if (profileError) {
-                        console.error('Profile creation error:', profileError);
+                if (password.length < 6) {
+                    showMessage(signupMessage, 'Password must be at least 6 characters', 'error');
+                    return;
+                }
+
+                setButtonLoading(signupBtn, true);
+                clearMessage(signupMessage);
+
+                try {
+                    // Sign up
+                    const { data, error } = await window.sb.auth.signUp({
+                        email,
+                        password
+                    });
+
+                    if (error) {
+                        showMessage(signupMessage, error.message, 'error');
+                        setButtonLoading(signupBtn, false);
+                        return;
+                    }
+
+                    // Create user profile with pending status
+                    if (data.user) {
+                        const { error: profileError } = await window.sb
+                            .from('user_profiles')
+                            .update({ full_name: name })
+                            .eq('id', data.user.id);
+
+                        if (profileError) {
+                            console.error('Profile creation error:', profileError);
+                        }
+                    }
+
+                    showMessage(signupMessage, 'Account created! Your access is pending admin approval.', 'success');
+
+                    // Clear form
+                    signupName.value = '';
+                    signupEmail.value = '';
+                    signupPassword.value = '';
+                    signupPasswordConfirm.value = '';
+
+                    // Reset to login tab after 2 seconds
+                    setTimeout(() => {
+                        tabs[0].click();
+                        setButtonLoading(signupBtn, false);
+                    }, 2000);
+
+                } catch (err) {
+                    showMessage(signupMessage, err.message || 'An error occurred', 'error');
+                    setButtonLoading(signupBtn, false);
+                }
+            }
+
+            // Password reset handler
+            async function handleResetClick() {
+                const email = resetEmail.value.trim();
+
+                if (!email) {
+                    showMessage(resetMessage, 'Please enter your email address', 'error');
+                    return;
+                }
+
+                setButtonLoading(resetBtn, true);
+                clearMessage(resetMessage);
+
+                try {
+                    const { error } = await window.sb.auth.resetPasswordForEmail(email, {
+                        redirectTo: window.location.origin + '/reset-password.html'
+                    });
+
+                    if (error) {
+                        showMessage(resetMessage, error.message, 'error');
+                    } else {
+                        showMessage(resetMessage, 'Password reset link sent to your email. Check your inbox!', 'success');
+                        resetEmail.value = '';
+
+                        setTimeout(() => {
+                            passwordResetSection.classList.remove('active');
+                            mainAuthSection.style.display = 'block';
+                            setButtonLoading(resetBtn, false);
+                        }, 3000);
+                    }
+                } catch (err) {
+                    showMessage(resetMessage, err.message || 'An error occurred', 'error');
+                    setButtonLoading(resetBtn, false);
+                }
+            }
+
+            // Check if user is already logged in
+            const AUTO_SUPERUSERS = ['elliot.kauffman@gmail.com'];
+            window.sb.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    const isSuperuser = AUTO_SUPERUSERS.includes(session.user.email.toLowerCase());
+
+                    if (isSuperuser) {
+                        const sessionData = {
+                            userId: session.user.id,
+                            email: session.user.email,
+                            userEmail: session.user.email,
+                            status: 'approved',
+                            role: 'superuser',
+                            allowedStates: ['ALL'],
+                            allowedRaceTypes: ['ALL'],
+                            allowedDistricts: ['ALL']
+                        };
+                        sessionStorage.setItem('supabaseSession', JSON.stringify(sessionData));
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+
+                    const { data: profile } = await window.sb
+                        .from('user_profiles')
+                        .select('status')
+                        .eq('id', session.user.id)
+                        .single();
+
+                    if (profile && profile.status === 'approved') {
+                        const sessionData = {
+                            userId: session.user.id,
+                            email: session.user.email,
+                            userEmail: session.user.email
+                        };
+
+                        sessionStorage.setItem('supabaseSession', JSON.stringify(sessionData));
+                        window.location.href = 'dashboard.html';
                     }
                 }
+            });
 
-                showMessage(signupMessage, 'Account created! Your access is pending admin approval.', 'success');
-
-                // Clear form
-                signupName.value = '';
-                signupEmail.value = '';
-                signupPassword.value = '';
-                signupPasswordConfirm.value = '';
-
-                // Reset to login tab after 2 seconds
-                setTimeout(() => {
-                    tabs[0].click();
-                    setButtonLoading(signupBtn, false);
-                }, 2000);
-
-            } catch (err) {
-                showMessage(signupMessage, err.message || 'An error occurred', 'error');
-                setButtonLoading(signupBtn, false);
-            }
-        });
-
-        // Password reset
-        resetBtn.addEventListener('click', async () => {
-            const email = resetEmail.value.trim();
-
-            if (!email) {
-                showMessage(resetMessage, 'Please enter your email address', 'error');
-                return;
+            // Initialize when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializeEventListeners);
+            } else {
+                initializeEventListeners();
             }
 
-            setButtonLoading(resetBtn, true);
-            clearMessage(resetMessage);
-
-            try {
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin + '/reset-password.html'
-                });
-
-                if (error) {
-                    showMessage(resetMessage, error.message, 'error');
-                } else {
-                    showMessage(resetMessage, 'Password reset link sent to your email. Check your inbox!', 'success');
-                    resetEmail.value = '';
-
-                    setTimeout(() => {
-                        passwordResetSection.classList.remove('active');
-                        mainAuthSection.style.display = 'block';
-                        setButtonLoading(resetBtn, false);
-                    }, 3000);
-                }
-            } catch (err) {
-                showMessage(resetMessage, err.message || 'An error occurred', 'error');
-                setButtonLoading(resetBtn, false);
-            }
-        });
-
-        // Check if user is already logged in
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_IN' && session) {
-                const { data: profile } = await supabase
-                    .from('user_profiles')
-                    .select('status')
-                    .eq('id', session.user.id)
-                    .single();
-
-                if (profile && profile.status === 'approved') {
-                    const sessionData = {
-                        userId: session.user.id,
-                        email: session.user.email,
-                        userEmail: session.user.email
-                    };
-
-                    sessionStorage.setItem('supabaseSession', JSON.stringify(sessionData));
-                    window.location.href = 'dashboard.html';
-                }
-            }
-        });
-
-        // Enter key support
-        loginPassword.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') loginBtn.click();
-        });
-
-        signupPasswordConfirm.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') signupBtn.click();
-        });
-
-        resetEmail.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') resetBtn.click();
-        });
+        } catch (globalError) {
+            console.error('Global script error:', globalError);
+            console.error('Error details:', globalError.message);
+            console.error('Stack:', globalError.stack);
+        }
     </script>
 </body>
 </html>
