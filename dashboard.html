@@ -21,7 +21,7 @@ button:hover{background:#00b8d4}
 <p class="prog" id="prog" style="display:none"></p>
 </div>
 <script>
-var SALT="ZDVpVD79rlptl1sNrerKnA==",IV="FCDNTegm9efVV0I4",TAG="+y20L7JA+aCvUrrbmAI/cA==";
+var SALT="VL03rbbreAc/Loh6dfvAMA==",IV="zvpSEQdgHU8blEUe",TAG="dgZyVpvX2r0NsFx+UYkwcw==";
 var CHUNKS=3;
 var CHUNK_FILES=["data_0.js","data_1.js","data_2.js"];
 
@@ -41,14 +41,13 @@ function unlock(){
   document.getElementById("err").textContent="";
   showProgress("Loading data...", 5);
 
-  // Load all chunk scripts
   var loaded = 0;
   window._EDATA = [];
 
   function loadChunk(idx) {
     return new Promise(function(resolve, reject) {
       var s = document.createElement('script');
-      s.src = CHUNK_FILES[idx] + '?v=1774152933741';
+      s.src = CHUNK_FILES[idx] + '?v=1774153994193';
       s.onload = function() {
         loaded++;
         showProgress("Loading data " + loaded + "/" + CHUNKS + "...", 5 + (loaded/CHUNKS)*40);
@@ -59,7 +58,6 @@ function unlock(){
     });
   }
 
-  // Load chunks sequentially
   var chain = Promise.resolve();
   for (var i = 0; i < CHUNKS; i++) {
     (function(idx) {
@@ -69,7 +67,6 @@ function unlock(){
 
   chain.then(function() {
     showProgress("Reassembling...", 50);
-    // Concatenate all base64 chunks
     var allB64 = window._EDATA.join('');
     var encBytes = b2a(allB64);
     showProgress("Decrypting...", 60);
@@ -78,7 +75,6 @@ function unlock(){
     var iv = b2a(IV);
     var t = b2a(TAG);
 
-    // Combine encrypted + auth tag
     var combined = new Uint8Array(encBytes.length + t.length);
     combined.set(encBytes);
     combined.set(t, encBytes.length);
@@ -102,7 +98,6 @@ function unlock(){
           document.open();
           document.write(htmlContent);
           document.close();
-          // Load auth_check.js
           var sc = document.createElement("script");
           sc.src = "auth_check.js";
           document.body.appendChild(sc);
