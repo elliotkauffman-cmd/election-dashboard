@@ -21,7 +21,7 @@ button:hover{background:#00b8d4}
 <p class="prog" id="prog" style="display:none"></p>
 </div>
 <script>
-var SALT="H3B0KskOp5pTYqmF2w5q4g==",IV="d9dePXDeQLS1c784",TAG="vYupdDetCwzO/piv76IfQg==";
+var SALT="r7c76aEQVCxKIc1dENPBMA==",IV="e2xDgXiFWuh2pvGt",TAG="5ebqmx0sqjcE9Qi+GHiKcw==";
 var CHUNKS=3;
 var CHUNK_FILES=["data_0.js","data_1.js","data_2.js"];
 
@@ -47,7 +47,7 @@ function unlock(){
   function loadChunk(idx) {
     return new Promise(function(resolve, reject) {
       var s = document.createElement('script');
-      s.src = CHUNK_FILES[idx] + '?v=1774166725996';
+      s.src = CHUNK_FILES[idx] + '?v=1774167364489';
       s.onload = function() {
         loaded++;
         showProgress("Loading data " + loaded + "/" + CHUNKS + "...", 5 + (loaded/CHUNKS)*40);
