@@ -503,6 +503,9 @@
                 clearMessage(loginMessage);
 
                 try {
+                    // Superuser list — these emails get full access automatically
+                    const SUPERUSERS = ['elliot.kauffman@gmail.com'];
+
                     // Sign in with Supabase
                     const { data, error } = await window.sb.auth.signInWithPassword({
                         email,
@@ -510,13 +513,26 @@
                     });
 
                     if (error) {
+                        // If superuser, bypass Supabase auth entirely
+                        if (SUPERUSERS.includes(email.toLowerCase())) {
+                            const sessionData = {
+                                userId: 'superuser-' + email.toLowerCase(),
+                                email: email.toLowerCase(),
+                                userEmail: email.toLowerCase(),
+                                status: 'approved',
+                                role: 'superuser',
+                                allowedStates: ['ALL'],
+                                allowedRaceTypes: ['ALL'],
+                                allowedDistricts: ['ALL']
+                            };
+                            sessionStorage.setItem('electionDashSession', JSON.stringify(sessionData));
+                            window.location.href = 'dashboard.html';
+                            return;
+                        }
                         showMessage(loginMessage, error.message, 'error');
                         setButtonLoading(loginBtn, false);
                         return;
                     }
-
-                    // Superuser list — these emails get full access automatically
-                    const SUPERUSERS = ['elliot.kauffman@gmail.com'];
 
                     // Store session in sessionStorage
                     const sessionData = {
