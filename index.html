@@ -504,7 +504,7 @@
 
                 try {
                     // Superuser list — these emails get full access automatically
-                    const SUPERUSERS = ['elliot.kauffman@gmail.com'];
+                    const SUPERUSERS = ['elliot.kauffman@gmail.com', 'thasanali777@gmail.com'];
 
                     // Sign in with Supabase
                     const { data, error } = await window.sb.auth.signInWithPassword({
@@ -698,7 +698,7 @@
             }
 
             // Check if user is already logged in
-            const AUTO_SUPERUSERS = ['elliot.kauffman@gmail.com'];
+            const AUTO_SUPERUSERS = ['elliot.kauffman@gmail.com', 'thasanali777@gmail.com'];
             window.sb.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session) {
                     const isSuperuser = AUTO_SUPERUSERS.includes(session.user.email.toLowerCase());
