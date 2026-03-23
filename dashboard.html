@@ -22,7 +22,7 @@ button:hover{background:#00b8d4}
 </div>
 <script>
 if(!sessionStorage.getItem("supabaseSession")){window.location.href="index.html";}
-var SALT="OLWWdJHu9zvBn+XK8r5wtA==",IV="yjjEAKf6i/sIqgv3",TAG="hMdhpTJ2fQCsN3UuhallNw==";
+var SALT="p9HavuaalFx2TD7ED8KKHQ==",IV="YGj31mKLrgNBeKDN",TAG="6o4cF8mnApoO0ypi9TG4fQ==";
 var CHUNKS=60;
 var CHUNK_FILES=["data_0.js","data_1.js","data_2.js","data_3.js","data_4.js","data_5.js","data_6.js","data_7.js","data_8.js","data_9.js","data_10.js","data_11.js","data_12.js","data_13.js","data_14.js","data_15.js","data_16.js","data_17.js","data_18.js","data_19.js","data_20.js","data_21.js","data_22.js","data_23.js","data_24.js","data_25.js","data_26.js","data_27.js","data_28.js","data_29.js","data_30.js","data_31.js","data_32.js","data_33.js","data_34.js","data_35.js","data_36.js","data_37.js","data_38.js","data_39.js","data_40.js","data_41.js","data_42.js","data_43.js","data_44.js","data_45.js","data_46.js","data_47.js","data_48.js","data_49.js","data_50.js","data_51.js","data_52.js","data_53.js","data_54.js","data_55.js","data_56.js","data_57.js","data_58.js","data_59.js"];
 function b2a(b){var r=atob(b),a=new Uint8Array(r.length);for(var i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a}
@@ -42,7 +42,7 @@ function unlock(){
   function loadChunk(idx){
     return new Promise(function(resolve,reject){
       var s=document.createElement("script");
-      s.src=CHUNK_FILES[idx]+"?v=1774183337635";
+      s.src=CHUNK_FILES[idx]+"?v=1774247611310";
       s.onload=function(){loaded++;showProgress("Loading data "+loaded+"/"+CHUNKS+"...",5+(loaded/CHUNKS)*40);resolve();};
       s.onerror=function(){reject(new Error("Failed to load "+CHUNK_FILES[idx]));};
       document.head.appendChild(s);
