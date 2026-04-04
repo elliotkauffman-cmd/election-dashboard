@@ -42,7 +42,7 @@ function unlock(){
   function loadChunk(idx){
     return new Promise(function(resolve,reject){
       var s=document.createElement("script");
-      s.src=CHUNK_FILES[idx]+"?v=1775135414153";
+      s.src=CHUNK_FILES[idx]+"?v=1775247189077";
       s.onload=function(){loaded++;showProgress("Loading data "+loaded+"/"+CHUNKS+"...",5+(loaded/CHUNKS)*40);resolve();};
       s.onerror=function(){reject(new Error("Failed to load "+CHUNK_FILES[idx]));};
       document.head.appendChild(s);
